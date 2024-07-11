@@ -19,11 +19,54 @@ from rich.table import Table
 # url = "https://www.rei.com/c/mens-hats-and-headwear"
 # url = "https://www.rei.com/c/mens-swimwear?sort=sc_revenue"
 # url = "https://www.rei.com/c/mens-socks?sort=sc_revenue"
-url = "https://www.rei.com/c/health-and-safety?sort=sc_revenue"
+# url = "https://www.rei.com/c/health-and-safety?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-running-and-athletic-socks?sort=sc_revenue"
+# url = "https://www.rei.com/c/hiking-jackets?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-base-layers?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-neck-gaiters?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-rain-jackets?sort=sc_revenue"
+# url = "https://www.rei.com/c/womens-hiking-footwear?sort=sc_revenue"
+# url = "https://www.rei.com/c/sleeping-bags?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-leg-gaiters?sort=sc_revenue"
+# url = "https://www.rei.com/c/leg-gaiters?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-hiking-pants?sort=sc_revenue"
+# url = "https://www.rei.com/c/hiking-pants?sort=sc_revenue"
+# url = "https://www.rei.com/c/eating-utensils?ir=category%3Acamp-dinnerware&r=category%3Acamp-dinnerware%7Ceating-utensils&sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-workout-pants"
+# url = "https://www.rei.com/c/camp-towels?ir=category%3Acamp-bathroom&r=category%3Acamp-bathroom%7Ccamp-towels"
+# url = "https://www.rei.com/c/tents?sort=sc_revenue"
+# url = "https://www.rei.com/c/backpacking-tents?sort=sc_revenue"
+# url = "https://www.rei.com/c/camping-tents?sort=sc_revenue"
+# url = "https://www.rei.com/c/sleeping-pads?sort=sc_revenue"
+# url = "https://www.rei.com/search?q=lantern&sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-hiking-jackets?ir=category%3Ahiking-jackets&r=category%3Ahiking-jackets%7Cmens-hiking-jackets&sort=sc_revenue"
+# url = "https://www.rei.com/c/camp-furniture?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-running-shirts?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-running-shorts?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-climbing-shoes?sort=sc_revenue"
+# url = "https://www.rei.com/c/chalk-and-chalk-bags"
+# url = "https://www.rei.com/c/camp-kitchen?sort=sc_revenue"
+# url = "https://www.rei.com/c/stoves-and-grills?sort=sc_revenue"
+# url = "https://www.rei.com/c/portable-water-treatment?sort=sc_revenue"
+# url = "https://www.rei.com/c/backpacking-packs?sort=sc_revenue"
+url = "https://www.rei.com/c/day-packs?sort=sc_revenue"
 
 headers = {
-    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "accept": "application/json",
+    "accept-language": "en-US,en;q=0.9",
+    "dnt": "1",
+    "origin": "https://www.rei.com",
+    "priority": "u=1, i",
+    "referer": url,
+    "sec-ch-ua": '"Not/A)Brand";v="8", "Chromium";v="126", "Google Chrome";v="126"',
+    "sec-ch-ua-mobile": "?0",
+    "sec-ch-ua-platform": '"macOS"',
+    "sec-fetch-dest": "empty",
+    "sec-fetch-mode": "cors",
+    "sec-fetch-site": "cross-site",
+    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
 }
+
 data = []
 page = 1
 
@@ -42,7 +85,7 @@ while True:
         name = product.select_one(".Xpx0MUGhB7jSm5UvK2EY").text.strip()
         price = product.select_one(".wKj5r3LozHWJf0OtkWPp").text.strip()
         if re.search(r"Save \d+%", price):
-            price = re.findall(r"\$\d+\.\d+", price)
+            price = re.findall(r"\$[\d,]+\.\d+", price)
             sale_price, price = price[0], price[1]
         else:
             sale_price = price
@@ -55,6 +98,8 @@ while True:
         except IndexError:
             rating = 0.0
 
+        link = "https://www.rei.com" + product.select_one("a").get("href")
+
         # data.append({"name": name, "reviews": reviews, "rating": rating, "price": price})
         data.append(
             {
@@ -64,6 +109,7 @@ while True:
                 "rating": rating,
                 "sale_price": sale_price,
                 "price": price,
+                "link": link,
             }
         )
 
@@ -81,6 +127,7 @@ table.add_column("Reviews", justify="right", style="dim")
 table.add_column("Rating", justify="right", style="dim")
 table.add_column("Sale Price", justify="right", style="dim")
 table.add_column("Price", justify="right", style="dim")
+table.add_column("Link", justify="right", style="dim")
 
 for product in sorted_data[:20]:
     table.add_row(
@@ -90,12 +137,13 @@ for product in sorted_data[:20]:
         str(product["rating"]),
         product["sale_price"],
         product["price"],
+        product["link"],
     )
 
 console.print(table)
 
 # print same as csv
-for product in sorted_data[:10]:
+for product in sorted_data[:20]:
     print(
         product["brand"],
         product["name"],
@@ -103,5 +151,6 @@ for product in sorted_data[:10]:
         str(product["rating"]),
         product["sale_price"],
         product["price"],
+        product["link"],
         sep=",",
     )
