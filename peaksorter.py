@@ -26,7 +26,7 @@ from rich.table import Table
 # url = "https://www.rei.com/c/mens-neck-gaiters?sort=sc_revenue"
 # url = "https://www.rei.com/c/mens-rain-jackets?sort=sc_revenue"
 # url = "https://www.rei.com/c/womens-hiking-footwear?sort=sc_revenue"
-# url = "https://www.rei.com/c/sleeping-bags?sort=sc_revenue"
+url = "https://www.rei.com/c/sleeping-bags?sort=sc_revenue"
 # url = "https://www.rei.com/c/mens-leg-gaiters?sort=sc_revenue"
 # url = "https://www.rei.com/c/leg-gaiters?sort=sc_revenue"
 # url = "https://www.rei.com/c/mens-hiking-pants?sort=sc_revenue"
@@ -49,7 +49,35 @@ from rich.table import Table
 # url = "https://www.rei.com/c/stoves-and-grills?sort=sc_revenue"
 # url = "https://www.rei.com/c/portable-water-treatment?sort=sc_revenue"
 # url = "https://www.rei.com/c/backpacking-packs?sort=sc_revenue"
-url = "https://www.rei.com/c/day-packs?sort=sc_revenue"
+# url = "https://www.rei.com/c/day-packs?sort=sc_revenue"
+# url = "https://www.rei.com/c/camp-hydration?sort=sc_revenue"
+# url = "https://www.rei.com/c/trekking-poles-hiking-staffs"
+# url = "https://www.rei.com/c/food?sort=sc_revenue"
+# url = "https://www.rei.com/c/backpacking-food?sort=sc_revenue"
+# url = "https://www.rei.com/c/stuff-sacks?sort=sc_revenue"
+# url = "https://www.rei.com/c/sleeping-pads?sort=sc_revenue"
+# url = "https://www.rei.com/c/energy-food-and-drinks?sort=sc_revenue"
+# url = "https://www.rei.com/c/bars"
+# url = "https://www.rei.com/c/road-cycling-shoes?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-casual-shoes?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-base-layer-tops?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-road-running-shoes?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-belts?sort=sc_revenue"
+# url = "https://www.rei.com/c/sleeping-bags?sort=sc_revenue"
+# url = "https://www.rei.com/c/trekking-poles-hiking-staffs?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-insulated-jackets?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-base-layer-tops??sort=sc_revenue"
+# url = "https://www.rei.com/c/backpacking-packs?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-hiking-jackets?sort=sc_revenue"
+# url = "https://www.rei.com/c/gloves?sort=sc_revenue"
+# url = "https://www.rei.com/c/lanterns?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-running-and-athletic-socks?sort=sc_revenue"
+# url = "https://www.rei.com/c/headlamps?sort=sc_revenue"
+# url = "https://www.rei.com/c/kids-base-layers?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-running-and-athletic-socks?sort=sc_revenue"
+# url = "https://www.rei.com/c/hiking-shirts?sort=sc_revenue"
+# url = "https://www.rei.com/c/hammocks?sort=sc_revenue"
+# url = "https://www.rei.com/c/mens-hiking-boots"
 
 headers = {
     "accept": "application/json",
@@ -90,12 +118,16 @@ while True:
         else:
             sale_price = price
 
-        reviews = product.select_one(".cdr-rating__count_13-5-2").text.strip()[1:-1]
+        count_el = product.select_one('[class*="cdr-rating__count_"]')
+        if count_el is None:
+            continue
+        reviews = count_el.text.strip().strip("()")
         reviews = int(reviews)
 
+        caption_el = product.select_one('[class*="cdr-rating__caption-sr_"]')
         try:
-            rating = product.select_one(".cdr-rating__caption-sr_13-5-2").text.strip().split()[7]
-        except IndexError:
+            rating = caption_el.text.strip().split()[7] if caption_el else 0.0
+        except (AttributeError, IndexError):
             rating = 0.0
 
         link = "https://www.rei.com" + product.select_one("a").get("href")
@@ -129,7 +161,7 @@ table.add_column("Sale Price", justify="right", style="dim")
 table.add_column("Price", justify="right", style="dim")
 table.add_column("Link", justify="right", style="dim")
 
-for product in sorted_data[:20]:
+for product in sorted_data[:30]:
     table.add_row(
         product["brand"],
         product["name"],
@@ -143,7 +175,7 @@ for product in sorted_data[:20]:
 console.print(table)
 
 # print same as csv
-for product in sorted_data[:20]:
+for product in sorted_data[:10]:
     print(
         product["brand"],
         product["name"],
